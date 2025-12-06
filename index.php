@@ -1,7 +1,9 @@
 <?php
 
 // Backend
-$nome = $_GET['nome'] ?? 'Visitante';
+$nomeBruto = $_GET['nome'] ?? 'Visitante';
+$nome = htmlspecialchars($nomeBruto);
+
 $cargo = "Backend Developer em Formação";
 $anoAtual = date('Y');
 
