@@ -1,48 +1,69 @@
 <?php
 
-// Backend
-$nomeDono = "William";
+declare(strict_types=1);
+
+// --- Configurações ---
+const ARQUIVO_MENSAGENS = 'mensagens.json';
+date_default_timezone_set('Europe/Lisbon');
+
+// --- Funções de Banco de Dados ---
+function lerMensagens(): array
+{
+    if (!file_exists(ARQUIVO_MENSAGENS)) {
+        return [];
+    }
+    $json = file_get_contents(ARQUIVO_MENSAGENS);
+    $lista = json_decode($json, true);
+    return is_array($lista) ? $lista : [];
+}
+
+function salvarMensagem(string $nome, string $texto): void
+{
+    $lista = lerMensagens();
+
+    $novaMensagem = [
+        'nome' => $nome,
+        'texto' => $texto,
+        'data' => date('d/m/Y H:i')
+    ];
+
+    array_unshift($lista, $novaMensagem);
+
+    file_put_contents(ARQUIVO_MENSAGENS, json_encode($lista, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+}
+
+// --- Lógica do Web Server ---
+$nomeDono = "William Dias";
 $cargo = "Backend Developer";
 $anoAtual = date('Y');
 
-$hora = (int)date('H');
+// --- Processamento do Formulário (POST) ---
+$feedback = "";
 
-if ($hora >= 6 && $hora < 12) {
-    $saudacao = "Bom dia ☀️";
-    $corFundo = "#f0f8ff";
-} else if ($hora >= 12 && $hora < 18) {
-    $saudacao = "Boa tarde 🌤️";
-    $corFundo = "#fffacd";
-} else {
-    $saudacao = "Boa noite 🌙";
-    $corFundo = "#2c3e50";
-    $corTexto = "#ecf0f1";
+if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
+    $feedback = "✅ Mensagem salva com sucesso!";
 }
-
-$corTexto = $corTexto ?? "#333";
-
-
-// Lógica do GET (URL)
-$nomeVisitante = $_GET['nome'] ?? 'Visitante';
-$nomeVisitante = htmlspecialchars($nomeVisitante);
-
-// Lógica POST (Processar Formulário)
-$mensagemFeedback = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $remetente = $_POST['remetente'] ?? '';
     $mensagem = $_POST['mensagem'] ?? '';
 
     // Sanitização
-    $remetente = htmlspecialchars($remetente);
-    $mensagem = htmlspecialchars($mensagem);
+    $remetente = htmlspecialchars(trim($remetente));
+    $mensagem = htmlspecialchars(trim($mensagem));
 
-    if ($remetente !== '' && $mensagem !== '') {
-        $mensagemFeedback = "✅ Obrigado, $remetente! A tua mensagem foi recebida.";
+    if (!empty($remetente) && !empty($mensagem)) {
+        salvarMensagem($remetente, $mensagem);
+
+        header("Location: index.php?status=sucesso");
+        exit;
     } else {
-        $mensagemFeedback = "❌ Por favor, preenche todos os campos.";
+        $feedback = "❌ Por favor, preenche todos os campos.";
     }
 }
+
+// Carregar mensagens para exibir na tela
+$listaMensagens = lerMensagens();
 ?>
 
 <!DOCTYPE html>
@@ -50,105 +71,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <head>
     <meta charset="UTF-8">
-    <title>Cartão Digital Interativo</title>
+    <title>Guestbook do William</title>
     <style>
     body {
-        background-color: <?php echo $corFundo;
-        ?>;
-        color: <?php echo $corTexto;
-        ?>;
+        background-color: #2c3e50;
+        color: #ecf0f1;
         font-family: sans-serif;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
-        min-height: 100vh;
+        padding: 20px;
         margin: 0;
     }
 
     .container {
         width: 100%;
-        max-width: 400px;
-        text-align: center;
+        max-width: 500px;
     }
 
-    .card {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Estilo do Cartão Principal */
+    .profile-card {
+        background: #34495e;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         margin-bottom: 20px;
     }
 
-    /* Estilos do Formulário */
+    /* Estilo do Formulário */
+    .form-card {
+        background: #ecf0f1;
+        color: #333;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
     input,
     textarea {
         width: 100%;
         padding: 10px;
-        margin: 10px 0;
+        margin: 5px 0 15px 0;
+        border: 1px solid #bdc3c7;
         border-radius: 5px;
-        border: 1px solid #ccc;
         box-sizing: border-box;
-        /* Garante que o padding não estoure a largura */
     }
 
     button {
-        background-color: #ff4757;
+        width: 100%;
+        padding: 10px;
+        background: #27ae60;
         color: white;
         border: none;
-        padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 1rem;
-        width: 100%;
+        font-weight: bold;
     }
 
     button:hover {
-        background-color: #ff6b81;
+        background: #2ecc71;
+    }
+
+    /* Estilo da Lista de Mensagens */
+    .msg-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .msg-item {
+        background: #fff;
+        color: #333;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 5px solid #3498db;
+    }
+
+    .msg-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+    }
+
+    .msg-author {
+        font-weight: bold;
+        color: #2980b9;
     }
 
     .feedback {
-        background-color: rgba(0, 0, 0, 0.3);
+        background: #e67e22;
+        color: white;
         padding: 10px;
+        text-align: center;
         border-radius: 5px;
         margin-bottom: 15px;
-        font-weight: bold;
     }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="card">
-            <h1>
-                <?php echo $saudacao; ?>, <?php echo $nomeVisitante; ?>!
-            </h1>
-            <p>
-                Eu sou o <strong><?php echo $nomeDono; ?></strong>
-            </p>
-            <p>
-                <?php echo $cargo; ?>
-            </p>
+        <div class="profile-card">
+            <h1><?php echo $nomeDono; ?></h1>
+            <p><?php echo $cargo; ?></p>
         </div>
 
-        <?php if ($mensagemFeedback !== ''): ?>
+        <?php if ($feedback): ?>
         <div class="feedback">
-            <?php echo $mensagemFeedback; ?>
+            <?php echo $feedback; ?>
         </div>
         <?php endif; ?>
 
-        <div class="card">
-            <h3>Deixe uma mensagem</h3>
-
-            <form method="POST" action="">
+        <div class="form-card">
+            <h3>Deixa a tua marca ✍🏻</h3>
+            <form method="POST">
                 <input type="text" name="remetente" placeholder="O teu nome..." required>
-                <textarea name="mensagem" rows="4" placeholder="Escreve aqui..." required></textarea>
-                <button type="submit">Enviar Mensagem</button>
+                <textarea name="mensagem" rows="3" placeholder="Escreve algo fixe..." required></textarea>
+                <button type="submit">Publicar Mensagem</button>
             </form>
         </div>
 
-        <small>&copy; <?php echo $anoAtual; ?> - PHP Moderno</small>
+        <h3>Últimas Mensagens (<?php echo count($listaMensagens); ?>)</h3>
+
+        <ul class="msg-list">
+            <?php foreach ($listaMensagens as $msg): ?>
+            <li class="msg-item">
+                <div class="msg-header">
+                    <span class="msg-autor">
+                        <?php echo $msg['nome']; ?>
+                    </span>
+                </div>
+                <?php echo $msg['texto']; ?>
+            </li>
+            <?php endforeach; ?>
+
+            <?php if (count($listaMensagens) === 0): ?>
+            <p style="text-align: center; opacity:0.6;">Seja o primeiro a comentar!</p>
+            <?php endif; ?>
+        </ul>
+
+        <small style="opacity: 0.5;">&copy; <?php echo $anoAtual; ?> - Sistema PHP JSON</small>
     </div>
 </body>
 
