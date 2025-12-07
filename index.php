@@ -11,6 +11,7 @@ require_once 'src/Guestbook.php';
 use Carbon\Carbon;
 
 date_default_timezone_set('Europe/Lisbon');
+Carbon::setLocale('pt');
 
 // Criar o Guestbook
 $meuGuestbook = new Guestbook('mensagens.json');
@@ -187,9 +188,7 @@ $listaMensagens = $meuGuestbook->ler();
                     <span class="msg-date">
                         <?php
                             if (isset($msg['data_hora'])) {
-                                $data = Carbon::parse($msg['data_hora']);
-                                $data->locale('pt');
-                                echo $data->diffForHumans();
+                                echo Carbon::parse($msg['data_hora'])->diffForHumans();
                             } else {
                                 echo $msg['data'] ?? 'Data desconhecida';
                             }
