@@ -2,68 +2,44 @@
 
 declare(strict_types=1);
 
-// --- Configurações ---
-const ARQUIVO_MENSAGENS = 'mensagens.json';
+// Importar a classe
+require_once 'src/Guestbook.php';
+
 date_default_timezone_set('Europe/Lisbon');
 
-// --- Funções de Banco de Dados ---
-function lerMensagens(): array
-{
-    if (!file_exists(ARQUIVO_MENSAGENS)) {
-        return [];
-    }
-    $json = file_get_contents(ARQUIVO_MENSAGENS);
-    $lista = json_decode($json, true);
-    return is_array($lista) ? $lista : [];
-}
+// Criar o Guestbook
+$meuGuestbook = new Guestbook('mensagens.json');
 
-function salvarMensagem(string $nome, string $texto): void
-{
-    $lista = lerMensagens();
-
-    $novaMensagem = [
-        'nome' => $nome,
-        'texto' => $texto,
-        'data' => date('d/m/Y H:i')
-    ];
-
-    array_unshift($lista, $novaMensagem);
-
-    file_put_contents(ARQUIVO_MENSAGENS, json_encode($lista, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-}
-
-// --- Lógica do Web Server ---
-$nomeDono = "William Dias";
-$cargo = "Backend Developer";
+// --- Lógica Web Server ---
+$nomeDono = "William";
+$cargo = "Backend Developer PHP";
 $anoAtual = date('Y');
 
-// --- Processamento do Formulário (POST) ---
 $feedback = "";
 
+// Verifica sucesso (GET)
 if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     $feedback = "✅ Mensagem salva com sucesso!";
 }
 
+// Processo de Envio (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $remetente = $_POST['remetente'] ?? '';
-    $mensagem = $_POST['mensagem'] ?? '';
-
-    // Sanitização
-    $remetente = htmlspecialchars(trim($remetente));
-    $mensagem = htmlspecialchars(trim($mensagem));
+    $remetente = htmlspecialchars(trim($_POST['remetente'] ?? ''));
+    $mensagem = htmlspecialchars(trim($_POST['mensagem'] ?? ''));
 
     if (!empty($remetente) && !empty($mensagem)) {
-        salvarMensagem($remetente, $mensagem);
+        $meuGuestbook->salvar($remetente, $mensagem);
 
         header("Location: index.php?status=sucesso");
         exit;
     } else {
-        $feedback = "❌ Por favor, preenche todos os campos.";
+        $feedback = "❌ Preenche todos os campos!";
     }
 }
 
-// Carregar mensagens para exibir na tela
-$listaMensagens = lerMensagens();
+// Carregar mensagens
+$listaMensagens = $meuGuestbook->ler();
+
 ?>
 
 <!DOCTYPE html>
