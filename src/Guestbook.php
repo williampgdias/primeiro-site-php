@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+// Import Carbon
+use Carbon\Carbon;
+
 class Guestbook
 {
     private string $arquivo;
@@ -18,7 +21,7 @@ class Guestbook
         $novaMensagem = [
             'nome' => $nome,
             'texto' => $texto,
-            'data' => date('d/m/Y H:i')
+            'data_hora' => Carbon::now()->toIso8601String()
         ];
 
         array_unshift($lista, $novaMensagem);

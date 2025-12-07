@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+// Autoload Composer
+require_once __DIR__ . '/vendor/autoload.php';
+
 // Importar a classe
 require_once 'src/Guestbook.php';
+
+use Carbon\Carbon;
 
 date_default_timezone_set('Europe/Lisbon');
 
@@ -178,6 +183,17 @@ $listaMensagens = $meuGuestbook->ler();
                 <div class="msg-header">
                     <span class="msg-autor">
                         <?php echo $msg['nome']; ?>
+                    </span>
+                    <span class="msg-date">
+                        <?php
+                            if (isset($msg['data_hora'])) {
+                                $data = Carbon::parse($msg['data_hora']);
+                                $data->locale('pt');
+                                echo $data->diffForHumans();
+                            } else {
+                                echo $msg['data'] ?? 'Data desconhecida';
+                            }
+                            ?>
                     </span>
                 </div>
                 <?php echo $msg['texto']; ?>
