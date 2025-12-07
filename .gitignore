@@ -1,0 +1,5 @@
+# Ignorar Banco de Dados
+mensagens.json
+
+# Ignorar arquivos de sistema do Mac (lixo que o Mac cria)
+.DS_Store
