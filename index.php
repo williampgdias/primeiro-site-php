@@ -16,6 +16,15 @@ Carbon::setLocale('pt');
 // Criar o Guestbook
 $meuGuestbook = new Guestbook('mensagens.json');
 
+// Exclusão
+if (isset($_GET['acao']) && $_GET['acao'] === 'excluir' && isset($_GET['id'])) {
+    $idParaExcluir = $_GET['id'];
+    $meuGuestbook->excluir($idParaExcluir);
+
+    header("Location: index.php?status=excluido");
+    exit;
+}
+
 // --- Lógica Web Server ---
 $nomeDono = "William";
 $cargo = "Backend Developer PHP";
@@ -26,6 +35,8 @@ $feedback = "";
 // Verifica sucesso (GET)
 if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     $feedback = "✅ Mensagem salva com sucesso!";
+} elseif ($_GET['status'] === 'excluido') {
+    $feedback = "🗑️ Mensagem apagada!";
 }
 
 // Processo de Envio (POST)
@@ -193,6 +204,14 @@ $listaMensagens = $meuGuestbook->ler();
                                 echo $msg['data'] ?? 'Data desconhecida';
                             }
                             ?>
+
+                        <?php if (isset($msg['id'])): ?>
+                        <a href="index.php?acao=excluir&id=<?php echo $msg['id']; ?>"
+                            style="color: #e74c3c; text-decoration: none; margin-left: 10px; font-weight: bold;"
+                            onclick="return confirm('Tem certeza que quer apagar esta mensagem?')">
+                            &times;
+                        </a>
+                        <?php endif; ?>
                     </span>
                 </div>
                 <?php echo $msg['texto']; ?>

@@ -19,14 +19,25 @@ class Guestbook
         $lista = $this->ler();
 
         $novaMensagem = [
+            'id' => uniqid(),
             'nome' => $nome,
             'texto' => $texto,
             'data_hora' => Carbon::now()->toIso8601String()
         ];
 
         array_unshift($lista, $novaMensagem);
+        $this->gravarNoDisco($lista);
+    }
 
-        file_put_contents($this->arquivo, json_encode($lista, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    public function excluir(string $id): void
+    {
+        $lista = $this->ler();
+
+        $novaLista = array_filter($lista, function ($msg) use ($id) {
+            return ($msg['id'] ?? '') !== $id;
+        });
+
+        $this->gravarNoDisco(array_values($novaLista));
     }
 
     public function ler(): array
@@ -37,5 +48,10 @@ class Guestbook
         $json = file_get_contents($this->arquivo);
         $lista = json_decode($json, true);
         return is_array($lista) ? $lista : [];
+    }
+
+    private function gravarNoDisco(array $dados): void
+    {
+        file_put_contents($this->arquivo, json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 }
