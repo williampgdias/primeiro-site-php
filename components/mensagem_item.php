@@ -1,43 +1,49 @@
 <?php
 
-use Carbon\Carbon; ?>
+use Carbon\Carbon;
+// Pega a primeira letra do nome para o Avatar (ex: "W" de William)
+$inicial = strtoupper(substr($msg['nome'], 0, 1));
+?>
 
 <li class="msg-item">
     <div class="msg-header">
-        <span class="msg-autor"><?php echo $msg['nome']; ?></span>
-        <span class="msg-date">
-            <?php echo isset($msg['data_hora']) ? Carbon::parse($msg['data_hora'])->diffForHumans() : ($msg['data'] ?? 'Data'); ?>
+        <div class="avatar"><?php echo $inicial; ?></div>
 
-            <?php if (isset($msg['id'])): ?>
-            <a href="index.php?acao=editar&id=<?php echo $msg['id']; ?>"
-                style="color: #f39c12; text-decoration: none; margin-left: 10px; font-weight: bold;">[Editar]</a>
-            <a href="index.php?acao=excluir&id=<?php echo $msg['id']; ?>"
-                style="color: #e74c3c; text-decoration: none; margin-left: 5px; font-weight: bold;"
-                onclick="return confirm('Apagar?')">&times;</a>
-            <?php endif; ?>
-        </span>
+        <div class="msg-info">
+            <span class="msg-autor"><?php echo $msg['nome']; ?></span>
+            <span class="msg-date">
+                <?php echo isset($msg['data_hora']) ? Carbon::parse($msg['data_hora'])->diffForHumans() : ($msg['data'] ?? 'Data'); ?>
+
+                <?php if (isset($msg['editado_em'])): ?>
+                &bull; Editado
+                <?php endif; ?>
+            </span>
+        </div>
+
+        <?php if (isset($msg['id'])): ?>
+        <div class="msg-actions">
+            <a href="index.php?acao=editar&id=<?php echo $msg['id']; ?>" style="color: #f7b928;" title="Editar">✏️</a>
+            <a href="index.php?acao=excluir&id=<?php echo $msg['id']; ?>" style="color: #e74c3c;"
+                onclick="return confirm('Apagar?')" title="Excluir">🗑️</a>
+        </div>
+        <?php endif; ?>
     </div>
 
     <div class="msg-body">
         <?php echo nl2br($msg['texto']); ?>
     </div>
 
-    <?php if (isset($msg['editado_em'])): ?>
-    <div style="font-size: 0.7rem; color: #95a5a6; margin-top: 5px; font-style: italic;">(Editado
-        <?php echo Carbon::parse($msg['editado_em'])->diffForHumans(); ?>)</div>
-    <?php endif; ?>
-
     <?php if (isset($msg['id'])): ?>
-    <details style="margin-top: 10px; cursor: pointer;">
-        <summary style="color: #3498db; font-size: 0.9rem;">Responder a <?php echo $msg['nome']; ?></summary>
+    <details>
+        <summary>Responder</summary>
 
         <form action="index.php" method="POST" class="form-resposta">
             <input type="hidden" name="acao" value="responder">
             <input type="hidden" name="id_pai" value="<?php echo $msg['id']; ?>">
 
             <input type="text" name="nome_resposta" placeholder="Seu nome..." required>
-            <textarea name="texto_resposta" rows="2" placeholder="Sua resposta..." required></textarea>
-            <button type="submit" class="btn-responder-envia">Enviar Resposta</button>
+            <textarea name="texto_resposta" placeholder="Escreva uma resposta..." required></textarea>
+            <button type="submit" class="btn-responder-envia">Enviar</button>
         </form>
     </details>
     <?php endif; ?>
@@ -45,14 +51,18 @@ use Carbon\Carbon; ?>
     <?php if (!empty($msg['respostas'])): ?>
     <div class="respostas-container">
         <?php foreach ($msg['respostas'] as $resp): ?>
+        <?php $inicialResp = strtoupper(substr($resp['nome'], 0, 1)); ?>
+
         <div class="resposta-item">
-            <div class="msg-header">
-                <span class="msg-autor" style="color: #e67e22;"><?php echo $resp['nome']; ?></span>
-                <span style="font-size: 0.75rem;">
-                    <?php echo Carbon::parse($resp['data_hora'])->diffForHumans(); ?>
-                </span>
+            <div class="avatar avatar-small"><?php echo $inicialResp; ?></div>
+
+            <div class="resposta-balao">
+                <span class="resposta-autor"><?php echo $resp['nome']; ?></span>
+                <span class="resposta-texto"><?php echo nl2br($resp['texto']); ?></span>
             </div>
-            <div><?php echo nl2br($resp['texto']); ?></div>
+        </div>
+        <div class="resposta-data" style="margin-left: 50px;">
+            <?php echo Carbon::parse($resp['data_hora'])->diffForHumans(); ?>
         </div>
         <?php endforeach; ?>
     </div>
