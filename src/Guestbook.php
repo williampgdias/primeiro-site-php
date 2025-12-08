@@ -29,6 +29,33 @@ class Guestbook
         $this->gravarNoDisco($lista);
     }
 
+    public function buscarPorId(string $id): ?array
+    {
+        $lista = $this->ler();
+        foreach ($lista as $msg) {
+            if (($msg['id'] ?? '') === $id) {
+                return $msg;
+            }
+        }
+        return null;
+    }
+
+    public function atualizar(string $id, string $novoNome, string $novoTexto): void
+    {
+        $lista = $this->ler();
+
+        foreach ($lista as $index => $msg) {
+            if (($msg['id'] ?? '') === $id) {
+                $lista[$index]['nome'] = $novoNome;
+                $lista[$index]['texto'] = $novoTexto;
+                $lista[$index]['editado_em'] = Carbon::now()->toIso8601String();
+                break;
+            }
+        }
+
+        $this->gravarNoDisco($lista);
+    }
+
     public function excluir(string $id): void
     {
         $lista = $this->ler();

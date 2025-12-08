@@ -16,6 +16,18 @@ Carbon::setLocale('pt');
 // Criar o Guestbook
 $meuGuestbook = new Guestbook('mensagens.json');
 
+// Editar
+$msgEditar = null;
+$modoEdicao = false;
+
+// Verificar se o usuário clicou em editar
+if (isset($_GET['acao']) && $_GET['acao'] === 'editar' && isset($_GET['id'])) {
+    $msgEditar = $meuGuestbook->buscarPorId($_GET['id']);
+    if ($msgEditar) {
+        $modoEdicao = true;
+    }
+}
+
 // Exclusão
 if (isset($_GET['acao']) && $_GET['acao'] === 'excluir' && isset($_GET['id'])) {
     $idParaExcluir = $_GET['id'];
@@ -33,21 +45,32 @@ $anoAtual = date('Y');
 $feedback = "";
 
 // Verifica sucesso (GET)
-if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
-    $feedback = "✅ Mensagem salva com sucesso!";
-} elseif ($_GET['status'] === 'excluido') {
-    $feedback = "🗑️ Mensagem apagada!";
+// if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
+//     $feedback = "✅ Mensagem salva com sucesso!";
+// } elseif ($_GET['status'] === 'excluido') {
+//     $feedback = "🗑️ Mensagem apagada!";
+// }
+
+if (isset($_GET['status'])) {
+    if ($_GET['status'] === 'sucesso') $feedback = '✅ Mensagem salva com sucesso!';
+    elseif ($_GET['status'] === 'excluido') $feedback = "🗑️ Mensagem apagada!";
+    elseif ($_GET['status'] === 'editado') $feedback = "✏️ Mensagem atualizada com sucesso!";
 }
 
 // Processo de Envio (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $remetente = htmlspecialchars(trim($_POST['remetente'] ?? ''));
     $mensagem = htmlspecialchars(trim($_POST['mensagem'] ?? ''));
+    $idEdicao = $_POST['id_edicao'] ?? '';
 
     if (!empty($remetente) && !empty($mensagem)) {
-        $meuGuestbook->salvar($remetente, $mensagem);
-
-        header("Location: index.php?status=sucesso");
+        if (!empty($idEdicao)) {
+            $meuGuestbook->atualizar($idEdicao, $remetente, $mensagem);
+            header('Location: index.php?status=editado');
+        } else {
+            $meuGuestbook->salvar($remetente, $mensagem);
+            header("Location: index.php?status=sucesso");
+        }
         exit;
     } else {
         $feedback = "❌ Preenche todos os campos!";
@@ -126,6 +149,14 @@ $listaMensagens = $meuGuestbook->ler();
         background: #2ecc71;
     }
 
+    button.btn-editar {
+        background: #f39c12;
+    }
+
+    button.btn-editar:hover {
+        background: #e67e22;
+    }
+
     /* Estilo da Lista de Mensagens */
     .msg-list {
         list-style: none;
@@ -179,11 +210,27 @@ $listaMensagens = $meuGuestbook->ler();
         <?php endif; ?>
 
         <div class="form-card">
-            <h3>Deixa a tua marca ✍🏻</h3>
-            <form method="POST">
-                <input type="text" name="remetente" placeholder="O teu nome..." required>
-                <textarea name="mensagem" rows="3" placeholder="Escreve algo fixe..." required></textarea>
+            <h3><?php echo $modoEdicao ? '✏️ Editando Mensagem' : 'Deixa a tua marca ✍🏻'; ?></h3>
+
+            <form method="POST" action="index.php">
+                <?php if ($modoEdicao): ?>
+                <input type="hidden" name="id_edicao" value="<?php echo $msgEditar['id']; ?>">
+                <?php endif; ?>
+
+                <input type="text" name="remetente" placeholder="O teu nome..." required
+                    value="<?php echo $modoEdicao ? $msgEditar['nome'] : ''; ?>">
+
+                <textarea name="mensagem" rows="3" placeholder="Escreve algo fixe..."
+                    required><?php echo $modoEdicao ? $msgEditar['texto'] : ''; ?></textarea>
+
+                <?php if ($modoEdicao): ?>
+                <button type="submit" class="btn-editar">Salvar Alterações</button>
+                <a href="index.php"
+                    style="display:block; text-align:center; margin-top:10px; color:#7f8c8d; text-decoration:none;">Cancelar
+                    Edição</a>
+                <?php else: ?>
                 <button type="submit">Publicar Mensagem</button>
+                <?php endif; ?>
             </form>
         </div>
 
@@ -206,15 +253,27 @@ $listaMensagens = $meuGuestbook->ler();
                             ?>
 
                         <?php if (isset($msg['id'])): ?>
+                        <a href="index.php?acao=editar&id=<?php echo $msg['id']; ?>"
+                            style="color: #f39c12; text-decoration: none; margin-left: 10px; font-weight: bold;"
+                            title="Editar mensagem">
+                            [Editar]
+                        </a>
+
                         <a href="index.php?acao=excluir&id=<?php echo $msg['id']; ?>"
-                            style="color: #e74c3c; text-decoration: none; margin-left: 10px; font-weight: bold;"
-                            onclick="return confirm('Tem certeza que quer apagar esta mensagem?')">
+                            style="color: #e74c3c; text-decoration: none; margin-left: 5px; font-weight: bold;"
+                            onclick="return confirm('Apagar mensagem?')" title="Excluir mensagem">
                             &times;
                         </a>
                         <?php endif; ?>
                     </span>
                 </div>
                 <?php echo $msg['texto']; ?>
+
+                <?php if (isset($msg['editado_em'])): ?>
+                <div style="font-size: 0.7rem; color: #95a5a6; margin-top: 5px; font-style: italic;">
+                    (Editado <?php echo Carbon::parse($msg['editado_em'])->diffForHumans(); ?>)
+                </div>
+                <?php endif; ?>
             </li>
             <?php endforeach; ?>
 
