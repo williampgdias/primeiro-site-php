@@ -6,30 +6,35 @@ Um sistema de livro de visitas (Guestbook) moderno, desenvolvido em PHP 8. O pro
 
 ## 📸 Screenshots
 
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 10px; align-items: center;">
   <img src="prints/darkmode.png" alt="Dark Mode" width="45%" />
   <img src="prints/lightmode.png" alt="Light Mode" width="45%" />
 </div>
 <br>
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 10px; align-items: center;">
   <img src="prints/admin-apagar-msg.png" alt="Dark Mode" width="45%" />
   <img src="prints/admin-msg-apagada.png" alt="Light Mode" width="45%" />
 </div>
 <br>
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 10px; align-items: center;">
   <img src="prints/admin-editando-msg.png" alt="Dark Mode" width="45%" />
   <img src="prints/admin-pagina-inicial.png" alt="Light Mode" width="45%" />
 </div>
 <br>
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 10px; align-items: center;">
   <img src="prints/btn-login.png" alt="Dark Mode" width="45%" />
   <img src="prints/comentario-respostas.png" alt="Light Mode" width="45%" />
 </div>
 <br>
-<div style="display: flex; gap: 10px;">
+<div style="display: flex; gap: 10px; align-items: center;">
   <img src="prints/pagina-login.png" alt="Dark Mode" width="45%" />
   <img src="prints/visitante-pagina-inicial.png" alt="Light Mode" width="45%" />
 </div>
+
+## 📺 Demo do Projeto
+
+Assista ao vídeo demonstrativo com todas as funcionalidades:
+[Clique aqui para assistir](LINK)
 
 ## 🚀 Funcionalidades
 
