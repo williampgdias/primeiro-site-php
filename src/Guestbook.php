@@ -56,6 +56,32 @@ class Guestbook
         $this->gravarNoDisco($lista);
     }
 
+    public function responder(string $idMensagemPai, string $nome, string $texto): void
+    {
+        $lista = $this->ler();
+
+        foreach ($lista as $index => $msg) {
+            if (($msg['id'] ?? '') === $idMensagemPai) {
+                $novaResposta = [
+                    'id' => uniqid(),
+                    'nome' => $nome,
+                    'texto' => $texto,
+                    'data_hora' => Carbon::now()->toIso8601String()
+                ];
+
+                // Se ainda não tiver respostas, cria o array. se tiver, adiciona a resposta no array.
+                if (!isset($lista[$index]['respostas'])) {
+                    $lista[$index]['respostas'] = [];
+                }
+
+                // Adiciona a resposta no topo da lista de respostas
+                array_unshift($lista[$index]['respostas'], $novaResposta);
+                break;
+            }
+        }
+        $this->gravarNoDisco($lista);
+    }
+
     public function excluir(string $id): void
     {
         $lista = $this->ler();

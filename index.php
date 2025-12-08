@@ -17,20 +17,33 @@ $modoEdicao = false;
 
 // --- LÓGICA DO SERVIDOR ---
 
-// 1. Carregar dados para edição
+// Carregar dados para edição
 if (isset($_GET['acao']) && $_GET['acao'] === 'editar' && isset($_GET['id'])) {
     $msgEditar = $meuGuestbook->buscarPorId($_GET['id']);
     if ($msgEditar) $modoEdicao = true;
 }
 
-// 2. Excluir
+// Excluir
 if (isset($_GET['acao']) && $_GET['acao'] === 'excluir' && isset($_GET['id'])) {
     $meuGuestbook->excluir($_GET['id']);
     header("Location: index.php?status=excluido");
     exit;
 }
 
-// 3. Processar Formulário (Criar ou Editar)
+// Processar NOVA RESPOSTA
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'responder') {
+    $idPai = $_POST['id_pai'] ?? '';
+    $nome = htmlspecialchars(trim($_POST['nome_resposta'] ?? ''));
+    $texto = htmlspecialchars(trim($_POST['texto_resposta'] ?? ''));
+
+    if (!empty($idPai) && !empty($nome) && !empty($texto)) {
+        $meuGuestbook->responder($idPai, $nome, $texto);
+        header("Location: index.php?status-respondido");
+        exit;
+    }
+}
+
+// Processar Formulário (Criar ou Editar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $remetente = htmlspecialchars(trim($_POST['remetente'] ?? ''));
     $mensagem = htmlspecialchars(trim($_POST['mensagem'] ?? ''));
@@ -75,6 +88,7 @@ $cargo = "Backend Developer PHP";
                 if ($_GET['status'] === 'sucesso') echo "✅ Mensagem salva!";
                 elseif ($_GET['status'] === 'excluido') echo "🗑️ Mensagem apagada!";
                 elseif ($_GET['status'] === 'editado') echo "✏️ Mensagem atualizada!";
+                elseif ($_GET['status'] === 'respondido') echo "💬 Resposta enviada!";
                 ?>
         </div>
         <?php endif; ?>

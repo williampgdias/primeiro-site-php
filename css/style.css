@@ -102,3 +102,42 @@ button.btn-editar:hover {
     border-radius: 5px;
     margin-bottom: 15px;
 }
+
+/* --- Estilos das Respostas --- */
+
+/* Container de todas as respostas */
+.respostas-container {
+    margin-top: 15px;
+    padding-left: 20px;
+    border-left: 2px solid #bdc3c7;
+}
+
+/* Item individual de resposta */
+.resposta-item {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+/* Formulário de resposta (escondido dentro do <details>) */
+.form-resposta {
+    background: #ecf0f1;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.form-resposta input,
+.form-resposta textarea {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.btn-responder-envia {
+    background-color: #3498db;
+    width: auto;
+    padding: 5px 15px;
+    font-size: 0.9em;
+}
