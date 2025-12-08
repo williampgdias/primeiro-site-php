@@ -33,8 +33,8 @@ Um sistema de livro de visitas (Guestbook) moderno, desenvolvido em PHP 8. O pro
 
 ## 📺 Demo do Projeto
 
-Assista ao vídeo demonstrativo com todas as funcionalidades:
-[Clique aqui para assistir](https://github.com/user-attachments/assets/9c69f97b-f0fb-4f54-9f60-ea0064a413f3)
+<video src="[COLE_O_LINK_AQUI](https://github.com/user-attachments/assets/9c69f97b-f0fb-4f54-9f60-ea0064a413f3)" controls="controls" style="max-width: 100%;">
+</video>
 
 ## 🚀 Funcionalidades
 
