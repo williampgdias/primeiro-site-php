@@ -2,8 +2,10 @@
 
 session_start();
 
-// Senha mestre
-$senhaSecreta = 'admin123';
+if (file_exists('config.php')) {
+    $config = require 'config.php';
+    $senhaSecreta = $config['senha_admin'];
+};
 
 $erro = '';
 
@@ -52,8 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button class="btn-voltar">Voltar ao Guestbook</button>
         </a>
     </div>
-
-    <script src="js/script.js"></script>
 </body>
 
 </html>

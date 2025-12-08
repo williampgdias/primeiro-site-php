@@ -5,3 +5,4 @@ mensagens.json
 .DS_Store
 
 /vendor
+/config.php
