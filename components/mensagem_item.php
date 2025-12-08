@@ -1,7 +1,7 @@
 <?php
 
 use Carbon\Carbon;
-// Pega a primeira letra do nome para o Avatar (ex: "W" de William)
+
 $inicial = strtoupper(substr($msg['nome'], 0, 1));
 ?>
 
@@ -13,14 +13,11 @@ $inicial = strtoupper(substr($msg['nome'], 0, 1));
             <span class="msg-autor"><?php echo $msg['nome']; ?></span>
             <span class="msg-date">
                 <?php echo isset($msg['data_hora']) ? Carbon::parse($msg['data_hora'])->diffForHumans() : ($msg['data'] ?? 'Data'); ?>
-
-                <?php if (isset($msg['editado_em'])): ?>
-                &bull; Editado
-                <?php endif; ?>
+                <?php if (isset($msg['editado_em'])): ?> &bull; Editado <?php endif; ?>
             </span>
         </div>
 
-        <?php if (isset($msg['id'])): ?>
+        <?php if (isset($msg['id']) && isset($isAdmin) && $isAdmin): ?>
         <div class="msg-actions">
             <a href="index.php?acao=editar&id=<?php echo $msg['id']; ?>" style="color: #f7b928;" title="Editar">✏️</a>
             <a href="index.php?acao=excluir&id=<?php echo $msg['id']; ?>" style="color: #e74c3c;"
@@ -33,15 +30,16 @@ $inicial = strtoupper(substr($msg['nome'], 0, 1));
         <?php echo nl2br($msg['texto']); ?>
     </div>
 
-    <?php if (isset($msg['id'])): ?>
+    <?php if (isset($msg['id']) && isset($isAdmin) && $isAdmin): ?>
     <details>
-        <summary>Responder</summary>
-
+        <summary>Responder como Admin</summary>
         <form action="index.php" method="POST" class="form-resposta">
             <input type="hidden" name="acao" value="responder">
             <input type="hidden" name="id_pai" value="<?php echo $msg['id']; ?>">
 
-            <input type="text" name="nome_resposta" placeholder="Seu nome..." required>
+            <input type="text" name="nome_resposta" value="William (Admin)" readonly
+                style="background: #e8f0fe; font-weight: bold;">
+
             <textarea name="texto_resposta" placeholder="Escreva uma resposta..." required></textarea>
             <button type="submit" class="btn-responder-envia">Enviar</button>
         </form>
@@ -52,10 +50,8 @@ $inicial = strtoupper(substr($msg['nome'], 0, 1));
     <div class="respostas-container">
         <?php foreach ($msg['respostas'] as $resp): ?>
         <?php $inicialResp = strtoupper(substr($resp['nome'], 0, 1)); ?>
-
         <div class="resposta-item">
             <div class="avatar avatar-small"><?php echo $inicialResp; ?></div>
-
             <div class="resposta-balao">
                 <span class="resposta-autor"><?php echo $resp['nome']; ?></span>
                 <span class="resposta-texto"><?php echo nl2br($resp['texto']); ?></span>

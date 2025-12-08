@@ -279,3 +279,18 @@ summary {
     font-weight: bold;
     border: 1px solid var(--accent-color);
 }
+
+/* CSS Específico para o Login centralizar na tela */
+body {
+    justify-content: center;
+    height: 100vh;
+}
+.login-card {
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+.btn-voltar {
+    background: #95a5a6;
+    margin-top: 10px;
+}
