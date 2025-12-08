@@ -31,7 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+
     <div class="form-card login-card">
+
+
         <h2>🔒 Acesso Restrito</h2>
 
         <?php if ($erro): ?>
@@ -49,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button class="btn-voltar">Voltar ao Guestbook</button>
         </a>
     </div>
+
+    <script src="js/script.js"></script>
 </body>
 
 </html>

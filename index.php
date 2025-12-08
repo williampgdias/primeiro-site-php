@@ -156,24 +156,7 @@ $cargo = "Backend Developer PHP";
         <small style="opacity: 0.5; margin-top: 20px;">&copy; <?php echo date('Y'); ?> - Sistema PHP Seguro</small>
     </div>
 
-    <script>
-    const toggleBtn = document.getElementById('theme-toggle');
-    const body = document.body;
-    if (localStorage.getItem('tema') === 'dark') {
-        body.classList.add('dark-mode');
-        toggleBtn.textContent = '☀️';
-    }
-    toggleBtn.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        if (body.classList.contains('dark-mode')) {
-            toggleBtn.textContent = '☀️';
-            localStorage.setItem('tema', 'dark');
-        } else {
-            toggleBtn.textContent = '🌙';
-            localStorage.setItem('tema', 'light');
-        }
-    });
-    </script>
+    <script src="js/script.js"></script>
 </body>
 
 </html>
